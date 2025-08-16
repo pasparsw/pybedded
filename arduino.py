@@ -32,21 +32,27 @@ def delay(time_in_ms: int) -> None:
     pass
 
 class Serial:
-    def begin(self, baudrate: int) -> int:
+    @staticmethod
+    def begin(baudrate: int) -> int:
         pass
 
-    def available(self) -> bool:
+    @staticmethod
+    def available() -> bool:
         pass
 
-    def print(self, message: str) -> None:
+    @staticmethod
+    def print(message: str) -> None:
         pass
 
-    def println(self, message: str) -> None:
+    @staticmethod
+    def println(message: str) -> None:
         pass
 
-    def read(self) -> str:
+    @staticmethod
+    def read() -> str:
         pass
 
+    @staticmethod
     def write(self) -> str:
         pass
 
@@ -109,7 +115,7 @@ class Arduino:
         line_number: int = 0
 
         while line_number < len(python_code):
-            python_line: str = python_code[line_number].lstrip().rstrip()
+            python_line: str = python_code[line_number].rstrip()
             # function definition
             if "def " in python_line and "(" in python_line and ")" in python_line:
                 function_name: str = python_line.split("def ")[1].split("(")[0]
@@ -117,36 +123,72 @@ class Arduino:
                 function_return_type: str = python_line.split("-> ")[1].split(":")[0]
                 function_return_type = "void" if function_return_type == "None" else function_return_type
                 num_of_tabs: int = int((len(python_line) - len(python_line.lstrip(" ")))/4) + 1
-                indentation: str = "    " * num_of_tabs
                 function_body_end_line = len(python_code)
 
                 for i in range(line_number + 1, len(python_code)):
                     current_num_of_tabs: int = int((len(python_code[i]) - len(python_code[i].lstrip(" ")))/4)
 
-                    if current_num_of_tabs < num_of_tabs:
-                        function_body_end_line = i
-                        break
+                    if current_num_of_tabs < num_of_tabs and i != len(python_code):
+                        next_num_of_tabs: int = int((len(python_code[i + 1]) - len(python_code[i + 1].lstrip(" ")))/4)
 
-                cpp_code += f"{function_return_type} {function_name}({function_arguments}) \n{{\n"
-                cpp_code += self.__parse_block(python_code[line_number + 1:function_body_end_line], indentation)
+                        if next_num_of_tabs < num_of_tabs:
+                            function_body_end_line = i
+                            break
+
+                current_indentation: str = indentation + "    "
+                cpp_code += f"{function_return_type} {function_name}({function_arguments})\n{{\n"
+                cpp_code += self.__parse_block(python_code[line_number + 1:function_body_end_line], current_indentation)
                 cpp_code += "}\n"
                 line_number = function_body_end_line
+                continue
             # function call
             elif "(" in python_line and ")" in python_line:
-                cpp_code += f"{indentation}{python_line};\n"
+                cpp_code += f"{indentation}{python_line.lstrip()};\n"
             # variable definition
             elif ": " in python_line and " = " in python_line:
                 variable_name: str = python_line.split(":")[0]
                 variable_type: str = python_line.split(": ")[1].split(" =")[0]
                 variable_value: str = python_line.split("= ")[1]
 
-                cpp_code += f"{indentation}{variable_type} {variable_name} = {variable_value};\n"
+                cpp_code += f"{indentation}{variable_type} {variable_name.lstrip()} = {variable_value};\n"
             # variable assignment
             elif " = " in python_line:
                 variable_name: str = python_line.split(" =")[0]
                 variable_value: str = python_line.split("= ")[1]
 
-                cpp_code += f"{indentation}{variable_name} = {variable_value};\n"
+                cpp_code += f"{indentation}{variable_name.lstrip()} = {variable_value};\n"
+            # python global variable
+            elif "global " in python_line:
+                line_number += 1
+                continue
+            # incrementation
+            elif " += " in python_line:
+                cpp_code += f"{indentation}{python_line.lstrip()};\n"
+            # if statement
+            elif "if " in python_line:
+                condition: str = python_line.split("if ")[1].split(":")[0]
+                cpp_code += f"{indentation}if ({condition})\n{indentation}{{\n"
+                num_of_tabs: int = int((len(python_line) - len(python_line.lstrip(" "))) / 4) + 1
+                if_statement_body_end_line = len(python_code)
+
+                for i in range(line_number + 1, len(python_code)):
+                    current_num_of_tabs: int = int((len(python_code[i]) - len(python_code[i].lstrip(" "))) / 4)
+
+                    if current_num_of_tabs < num_of_tabs and i != len(python_code):
+                        if python_code[i] == "\n":
+                            next_num_of_tabs: int = int((len(python_code[i + 1]) - len(python_code[i + 1].lstrip(" "))) / 4)
+
+                            if next_num_of_tabs > num_of_tabs:
+                                continue
+
+                        if_statement_body_end_line = i
+                        break
+
+                current_indentation: str = indentation + "    "
+                cpp_code += self.__parse_block(python_code[line_number + 1:if_statement_body_end_line], current_indentation)
+                cpp_code += f"{indentation}}}\n"
+                line_number = if_statement_body_end_line
+                continue
 
             line_number += 1
 
