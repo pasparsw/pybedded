@@ -1,5 +1,3 @@
-from arduino import *
-
 with Arduino("some port", "uno"):
     ADC_PIN: int = A1
     LED_PIN: int = 8

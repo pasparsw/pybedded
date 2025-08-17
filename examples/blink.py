@@ -1,6 +1,6 @@
-from arduino import *
+from src.arduino_board import *
 
-with Arduino("some port", "uno"):
+with ArduinoBoard("some port", "uno"):
     def setup() -> None:
         pinMode(LED_BUILTIN, OUTPUT)
 
