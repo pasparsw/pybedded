@@ -10,8 +10,5 @@ class Py2CppConverter:
     def convert(python_code: List[str]) -> str:
         model: CodeObject = CodeObject(content=[])
         model = PythonParser.build_model(model, python_code)
-        cpp_code: str = CppGenerator.generate(model, depth=0)
 
-        print(cpp_code)
-
-        return cpp_code
+        return CppGenerator.generate(model, depth=0)

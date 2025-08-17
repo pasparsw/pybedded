@@ -1,4 +1,5 @@
 import inspect
+import os.path
 
 from inspect import FrameInfo
 from typing import Tuple, List
@@ -25,7 +26,7 @@ class ArduinoBoard:
         file_path, start_line = self.__get_callers_properties()
         python_code: List[str] = self.__load_arduino_python_code(file_path, start_line)
         cpp_code: str = self.__convert_python_to_cpp(python_code)
-        ino_file_path: str = self.__create_ino_file(cpp_code)
+        ino_file_path: str = self.__create_ino_file(file_path, cpp_code)
 
         self.__compile_ino_file(ino_file_path)
         self.__flash_arduino()
@@ -49,8 +50,15 @@ class ArduinoBoard:
 
         return Py2CppConverter.convert(python_code)
 
-    def __create_ino_file(self, cpp_code) -> str:
+    def __create_ino_file(self, script_path: str, cpp_code: str) -> str:
         print(f"Creating .ino file")
+
+        file_name: str = f"{os.path.basename(script_path).rstrip(".py")}.ino"
+        dir_path: str = os.path.dirname(script_path)
+
+        with open(os.path.join(dir_path, file_name), 'w') as file:
+            file.write(cpp_code)
+
         return ""
 
     def __compile_ino_file(self, ino_file_path: str) -> None:
