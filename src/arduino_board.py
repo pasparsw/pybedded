@@ -3,7 +3,7 @@ import inspect
 from inspect import FrameInfo
 from typing import Tuple, List
 
-from src.py_to_cpp_converter.py_to_cpp import PyToCpp
+from src.py_to_cpp_converter.py_2_cpp_converter import Py2CppConverter
 from src.arduino_core.definitions import *
 from src.arduino_core.main_api import *
 from src.arduino_core.serial import *
@@ -47,11 +47,7 @@ class ArduinoBoard:
     def __convert_python_to_cpp(self, python_code: List[str]) -> str:
         print(f"Converting Python code to C++")
 
-        cpp_code = PyToCpp.convert(python_code, indentation="")
-
-        print(cpp_code)
-
-        return cpp_code
+        return Py2CppConverter.convert(python_code)
 
     def __create_ino_file(self, cpp_code) -> str:
         print(f"Creating .ino file")

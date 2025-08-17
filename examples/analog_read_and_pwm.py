@@ -1,4 +1,6 @@
-with Arduino("some port", "uno"):
+from src.arduino_board import *
+
+with ArduinoBoard("some port", "uno"):
     ADC_PIN: int = A1
     LED_PIN: int = 8
     WARNING_LED_PIN: int = 9
