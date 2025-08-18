@@ -187,7 +187,7 @@ class PythonParser:
         variable_name: str = python_line.split(" =")[0]
         variable_value: str = python_line.split("= ")[1]
 
-        variable_assignment = VariableAssignment(content=[], name=variable_name, value=variable_value)
+        variable_assignment = VariableAssignment(content=[], name=variable_name.lstrip(), value=variable_value)
         LOGGER.debug(f"Parsed variable assignment model: {variable_assignment}")
 
         root_object.content.append(variable_assignment)

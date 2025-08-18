@@ -55,7 +55,7 @@ class CppGenerator:
                     cpp_code += f"{indentation}{code_object.type} {code_object.name} = {code_object.value};\n"
             elif isinstance(code_object, VariableAssignment):
                 LOGGER.info(f"Given model is a variable assignment")
-                cpp_code += f"{code_object.name} = {code_object.value};\n"
+                cpp_code += f"{indentation}{code_object.name} = {code_object.value};\n"
 
             LOGGER.debug(f"Generated code: {cpp_code}")
 
