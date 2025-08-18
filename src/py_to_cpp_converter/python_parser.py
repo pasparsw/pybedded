@@ -1,3 +1,5 @@
+import logging
+
 from typing import List
 
 from src.py_to_cpp_converter.models.code_object import CodeObject
@@ -7,6 +9,8 @@ from src.py_to_cpp_converter.models.function_definition import FunctionArgument,
 from src.py_to_cpp_converter.models.if_statement import IfStatement
 from src.py_to_cpp_converter.models.variable_assignment import VariableAssignment
 from src.py_to_cpp_converter.models.variable_definition import VariableDefinition
+
+LOGGER = logging.getLogger("PythonParser")
 
 
 def is_function_definition(python_line: str) -> bool:
@@ -57,28 +61,38 @@ def get_block_end_line(line_number: int, python_code: List[str]) -> int:
 class PythonParser:
     @staticmethod
     def build_model(root_object: CodeObject, python_code: List[str]) -> CodeObject:
+        LOGGER.info(f"Parsing Python code to build an intermediate model (root: {root_object})")
+
         line_number: int = 0
 
         while line_number < len(python_code):
             python_line: str = python_code[line_number].rstrip()
 
             if is_function_definition(python_line):
+                LOGGER.debug(f"Found function definition at line {line_number}")
                 line_number = PythonParser.__parse_function_definition(root_object, python_line, python_code, line_number)
                 continue
             elif is_for_loop(python_line):
+                LOGGER.debug(f"Found for loop at line {line_number}")
                 line_number = PythonParser.__parse_for_loop(root_object, python_line, python_code, line_number)
                 continue
             elif is_if_statement(python_line):
+                LOGGER.debug(f"Found if statement at line {line_number}")
                 line_number = PythonParser.__parse_if_statement(root_object, python_line, python_code, line_number)
                 continue
-            elif is_function_call(python_line):
-                root_object.content.append(FunctionCall(content=[], call=python_line.lstrip()))
             elif is_variable_definition(python_line):
+                LOGGER.debug(f"Found variable definition at line {line_number}")
                 PythonParser.__parse_variable_definition(root_object, python_line)
+            elif is_function_call(python_line):
+                LOGGER.debug(f"Found function call at line {line_number}")
+                root_object.content.append(FunctionCall(content=[], call=python_line.lstrip()))
             elif is_variable_assignment(python_line):
+                LOGGER.debug(f"Found variable assignment at line {line_number}")
                 PythonParser.__parse_variable_assignment(root_object, python_line)
 
             line_number += 1
+
+        LOGGER.debug("Parsing done")
 
         return root_object
 
@@ -98,7 +112,11 @@ class PythonParser:
 
         function_definition = FunctionDefinition(content=[], name=function_name, arguments=args,
                                                  return_type=function_return_type)
+        LOGGER.debug(f"Parsed function definition mode: {function_definition}")
+
         function_def_end_line: int = get_block_end_line(line_number, python_code)
+        LOGGER.debug(f"Function body ends at line {function_def_end_line}")
+
         root_object.content.append(PythonParser.build_model(function_definition,
                                                          python_code[line_number + 1:function_def_end_line]))
         return function_def_end_line
@@ -128,7 +146,11 @@ class PythonParser:
             step = range_params[2]
 
         for_loop = ForLoop(content=[], start_index=start, end_index=end, step=step)
+        LOGGER.debug(f"Parsed for loop model: {for_loop}")
+
         for_loop_end_line: int = get_block_end_line(line_number, python_code)
+        LOGGER.debug(f"For loop body ends at line {for_loop_end_line}")
+
         root_object.content.append(PythonParser.build_model(for_loop,
                                                          python_code[line_number + 1:for_loop_end_line]))
         return for_loop_end_line
@@ -137,8 +159,13 @@ class PythonParser:
     def __parse_if_statement(root_object: CodeObject, python_line: str, python_code: List[str],
                              line_number: int) -> int:
         condition: str = python_line.split("if ")[1].split(":")[0].replace(" and ", " AND ").replace(" or ", " OR ")
+
         if_statement = IfStatement(content=[], condition=condition)
+        LOGGER.debug(f"Parsed if statement model: {if_statement}")
+
         if_statement_end_line: int = get_block_end_line(line_number, python_code)
+        LOGGER.debug(f"If statement body ends at line {if_statement_end_line}")
+
         root_object.content.append(PythonParser.build_model(if_statement,
                                                          python_code[line_number + 1:if_statement_end_line]))
         return if_statement_end_line
@@ -149,12 +176,18 @@ class PythonParser:
         variable_value: str = python_line.split("= ")[1]
         variable_type: str = python_line.split(": ")[1].split(" =")[0]
 
-        root_object.content.append(VariableDefinition(content=[], name=variable_name.lstrip(), type=variable_type,
-                                                      value=variable_value, is_compile_time=variable_name.isupper()))
+        variable_definition = VariableDefinition(content=[], name=variable_name.lstrip(), type=variable_type,
+                                                 value=variable_value, is_compile_time=variable_name.isupper())
+        LOGGER.debug(f"Parsed variable definition mode: {variable_definition}")
+
+        root_object.content.append(variable_definition)
 
     @staticmethod
     def __parse_variable_assignment(root_object: CodeObject, python_line: str) -> None:
         variable_name: str = python_line.split(" =")[0]
         variable_value: str = python_line.split("= ")[1]
 
-        root_object.content.append(VariableAssignment(content=[], name=variable_name, value=variable_value))
+        variable_assignment = VariableAssignment(content=[], name=variable_name, value=variable_value)
+        LOGGER.debug(f"Parsed variable assignment model: {variable_assignment}")
+
+        root_object.content.append(variable_assignment)

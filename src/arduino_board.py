@@ -1,72 +1,118 @@
 import inspect
+import logging
 import os.path
+import shutil
 
 from inspect import FrameInfo
 from typing import Tuple, List
 
 from src.py_to_cpp_converter.py_2_cpp_converter import Py2CppConverter
-from src.arduino_core.definitions import *
-from src.arduino_core.main_api import *
-from src.arduino_core.serial import *
+from src.sys_command_runner import SysCommandRunner
+from src.arduino_core.definitions import Board
+
+LOGGER = logging.getLogger("ArduinoBoard")
 
 FilePath = str
 LineNumber = int
 
 class ArduinoBoard:
-    def __init__(self, port: str, board_name: str):
+    def __init__(self, port: str, board: Board, verbose: bool = False):
         self.__port: str = port
-        self.__board_name: str = board_name
+        self.__board: Board = board
+        self.__verbose: bool = verbose
+
+        if self.__verbose:
+            logging.basicConfig(format='[%(levelname)s][%(name)s] %(message)s',
+                                level=logging.DEBUG)
 
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        print(f"Starting Python-to-Arduino conversion")
+        print("Uploading sketch...")
+
+        LOGGER.info(f"Starting Python-to-Arduino conversion")
 
         file_path, start_line = self.__get_callers_properties()
         python_code: List[str] = self.__load_arduino_python_code(file_path, start_line)
-        cpp_code: str = self.__convert_python_to_cpp(python_code)
-        ino_file_path: str = self.__create_ino_file(file_path, cpp_code)
+        cpp_code: str = Py2CppConverter.convert(python_code)
+        print(cpp_code)
+        arduino_project_path: str = self.__create_arduino_project(file_path, cpp_code)
 
-        self.__compile_ino_file(ino_file_path)
-        self.__flash_arduino()
+        self.__compile(arduino_project_path)
+        self.__upload(arduino_project_path)
+        self.__clean_up(arduino_project_path)
 
         print("Done")
 
     def __get_callers_properties(self) -> Tuple[FilePath, LineNumber]:
-        print("Getting properties of the Python script with Arduino code")
+        LOGGER.info("Getting properties of the Python script with Arduino code")
+
         frame: FrameInfo = inspect.stack()[2]
+        file_path: str = frame.filename
+        start_line: int = frame.lineno
+
+        LOGGER.debug(f"Python code available in {file_path}, starting at line {start_line}")
 
         return frame.filename, frame.lineno
 
     def __load_arduino_python_code(self, script_path: FilePath, python_code_start_line: LineNumber) -> List[str]:
-        print(f"Loading Python Arduino code from {script_path} starting at {python_code_start_line}")
+        LOGGER.info(f"Loading Python Arduino code from {script_path} starting at {python_code_start_line}")
 
         with open(script_path) as file:
             return file.readlines()[python_code_start_line:]
 
-    def __convert_python_to_cpp(self, python_code: List[str]) -> str:
-        print(f"Converting Python code to C++")
+    def __create_arduino_project(self, script_path: str, cpp_code: str) -> FilePath:
+        LOGGER.info(f"Creating Arduino project")
 
-        return Py2CppConverter.convert(python_code)
+        file_name: str = os.path.basename(script_path).rstrip(".py")
+        dir_path: str = os.path.join(os.path.dirname(script_path), file_name)
 
-    def __create_ino_file(self, script_path: str, cpp_code: str) -> str:
-        print(f"Creating .ino file")
+        if os.path.exists(dir_path):
+            LOGGER.warning(f"Project directory with the same name already exists - deleting...")
+            shutil.rmtree(dir_path)
 
-        file_name: str = f"{os.path.basename(script_path).rstrip(".py")}.ino"
-        dir_path: str = os.path.dirname(script_path)
+        LOGGER.debug(f"Creating project directory: {dir_path}")
+        os.mkdir(dir_path)
 
-        with open(os.path.join(dir_path, file_name), 'w') as file:
+        LOGGER.debug(f"Creating .ino file and saving C++ code")
+        with open(os.path.join(dir_path, f"{file_name}.ino"), 'w') as file:
             file.write(cpp_code)
 
-        return ""
+        LOGGER.debug(f"Arduino project created")
 
-    def __compile_ino_file(self, ino_file_path: str) -> None:
-        print(f"Compiling...")
-        pass
+        return dir_path
 
-    def __flash_arduino(self) -> None:
-        print(f"Flashing...")
-        pass
+    def __compile(self, arduino_project_path: FilePath) -> None:
+        LOGGER.info(f"Compiling C++ code")
 
+        SysCommandRunner.run_command(f"arduino-cli compile --fqbn {self.__board.value} {arduino_project_path}",
+                                     show_output=self.__verbose)
 
+        LOGGER.debug(f"Compilation done")
+
+    def __upload(self, arduino_project_path: FilePath) -> None:
+        """
+        # IMPORTANT: need to install arduino-cli first with sudo snap install arduino-cli
+        # and install all the necessary platforms (example: arduino-cli core install arduino:avr)
+        And this is a good content for bug of the week:
+        sudo snap connect arduino-cli:raw-usb
+        sudo snap set system experimental.hotplug=true
+        sudo systemctl restart snapd
+        sudo snap connect arduino-cli:serial-port
+        """
+        LOGGER.info(f"Flashing Arduino board")
+
+        SysCommandRunner.run_command(f"arduino-cli upload -p {self.__port} --fqbn {self.__board.value} {arduino_project_path}",
+                                     show_output=self.__verbose)
+
+        LOGGER.debug(f"Flashing done")
+
+    def __clean_up(self, arduino_project_path: str) -> None:
+        LOGGER.info(f"Cleaning up the workspace")
+
+        if os.path.exists(arduino_project_path):
+            LOGGER.info(f"Removing Arduino project folder")
+            shutil.rmtree(arduino_project_path)
+
+        LOGGER.debug(f"Clean up done")

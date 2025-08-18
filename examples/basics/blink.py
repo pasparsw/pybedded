@@ -1,6 +1,9 @@
-from src.arduino_board import *
+"""
+The C++ equivalent is available at https://docs.arduino.cc/built-in-examples/basics/Blink
+"""
+from src import *
 
-with ArduinoBoard("some port", "uno"):
+with ArduinoBoard("/dev/ttyUSB0", Board.NANO_OLD_BOOTLOADER):
     def setup() -> None:
         pinMode(LED_BUILTIN, OUTPUT)
 

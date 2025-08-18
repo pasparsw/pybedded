@@ -1,6 +1,4 @@
-from src.arduino_board import *
-
-with ArduinoBoard("some port", "uno"):
+with ArduinoBoard("/dev/ttyUSB0", Board.NANO_OLD_BOOTLOADER):
     ADC_PIN: int = A1
     LED_PIN: int = 8
     WARNING_LED_PIN: int = 9

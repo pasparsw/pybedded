@@ -18,9 +18,10 @@ A4 = 4
 A5 = 5
 
 # boards
-class Boards(Enum):
+class Board(Enum):
     UNO = "arduino:avr:uno"
     NANO = "arduino:avr:nano"
+    NANO_OLD_BOOTLOADER = "arduino:avr:nano:cpu=atmega328old"
     MEGA = "arduino:avr:mega"
 
 # other

@@ -1,3 +1,6 @@
+from typing import Any
+
+
 class Serial:
     @staticmethod
     def begin(baudrate: int) -> int:
@@ -8,11 +11,11 @@ class Serial:
         pass
 
     @staticmethod
-    def print(message: str) -> None:
+    def print(message: Any) -> None:
         pass
 
     @staticmethod
-    def println(message: str) -> None:
+    def println(message: Any) -> None:
         pass
 
     @staticmethod
@@ -20,5 +23,5 @@ class Serial:
         pass
 
     @staticmethod
-    def write(self) -> str:
+    def write() -> str:
         pass
