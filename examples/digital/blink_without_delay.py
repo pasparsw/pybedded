@@ -1,0 +1,28 @@
+"""
+The C++ equivalent is available at https://docs.arduino.cc/built-in-examples/digital/BlinkWithoutDelay
+"""
+from src import *
+
+with ArduinoBoard("/dev/ttyUSB0", Board.NANO_OLD_BOOTLOADER):
+    led_pin: int = LED_BUILTIN
+    led_state: int = LOW
+    previous_millis: unsigned_long = 0
+    interval: long = 1000
+
+    def setup() -> None:
+        pinMode(led_pin, OUTPUT)
+
+    def loop() -> None:
+        global previous_millis, led_state
+
+        current_millis: unsigned_long = millis()
+
+        if current_millis - previous_millis >= interval:
+            previous_millis = current_millis
+
+            if led_state == LOW:
+                led_state = HIGH
+            else:
+                led_state = LOW
+
+            digitalWrite(led_pin, led_state)

@@ -3,6 +3,7 @@ import logging
 from typing import List
 
 from src.py_to_cpp_converter.models.code_object import CodeObject
+from src.py_to_cpp_converter.models.else_block import ElseBlock
 from src.py_to_cpp_converter.models.for_loop import ForLoop
 from src.py_to_cpp_converter.models.function_call import FunctionCall
 from src.py_to_cpp_converter.models.function_definition import FunctionArgument, FunctionDefinition
@@ -35,6 +36,9 @@ def is_variable_definition(python_line: str) -> bool:
 
 def is_variable_assignment(python_line: str) -> bool:
     return " = " in python_line
+
+def is_else_block(python_line: str) -> bool:
+    return "else" in python_line
 
 
 def get_block_end_line(line_number: int, python_code: List[str]) -> int:
@@ -89,6 +93,10 @@ class PythonParser:
             elif is_variable_assignment(python_line):
                 LOGGER.debug(f"Found variable assignment at line {line_number}")
                 PythonParser.__parse_variable_assignment(root_object, python_line)
+            elif is_else_block(python_line):
+                LOGGER.debug(f"Found else block at line {line_number}")
+                line_number = PythonParser.__parse_else_block(root_object, python_code, line_number)
+                continue
 
             line_number += 1
 
@@ -191,3 +199,15 @@ class PythonParser:
         LOGGER.debug(f"Parsed variable assignment model: {variable_assignment}")
 
         root_object.content.append(variable_assignment)
+
+    @staticmethod
+    def __parse_else_block(root_object: CodeObject, python_code: List[str], line_number: int) -> int:
+        else_block = ElseBlock(content=[])
+        LOGGER.debug(f"Parsed else block model: {else_block}")
+
+        else_block_end_line: int = get_block_end_line(line_number, python_code)
+        LOGGER.debug(f"Else block body ends at line {else_block_end_line}")
+
+        root_object.content.append(PythonParser.build_model(else_block,
+                                                            python_code[line_number + 1:else_block_end_line]))
+        return else_block_end_line

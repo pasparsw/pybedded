@@ -1,6 +1,7 @@
 import logging
 
 from src.py_to_cpp_converter.models.code_object import CodeObject
+from src.py_to_cpp_converter.models.else_block import ElseBlock
 from src.py_to_cpp_converter.models.for_loop import ForLoop
 from src.py_to_cpp_converter.models.function_call import FunctionCall
 from src.py_to_cpp_converter.models.function_definition import FunctionDefinition
@@ -28,19 +29,19 @@ class CppGenerator:
                 for arg in code_object.arguments:
                     args += f"{arg.type} {arg.name}, "
 
-                cpp_code += f"{indentation}{code_object.return_type} {code_object.name}({args.rstrip(", ")})\n{indentation}{{\n"
+                cpp_code += f"{indentation}{code_object.return_type} {code_object.name}({args.rstrip(", ")}) {{\n"
                 cpp_code += CppGenerator.generate(code_object, depth + 1)
                 cpp_code += f"{indentation}}}\n"
             elif isinstance(code_object, ForLoop):
                 LOGGER.info(f"Given model is a for loop")
 
-                cpp_code += f"{indentation}for (int i={code_object.start_index}; i<{code_object.end_index}; i += {code_object.step})\n{indentation}{{\n"
+                cpp_code += f"{indentation}for (int i={code_object.start_index}; i<{code_object.end_index}; i += {code_object.step}) {{\n"
                 cpp_code += CppGenerator.generate(code_object, depth + 1)
                 cpp_code += f"{indentation}}}\n"
             elif isinstance(code_object, IfStatement):
                 LOGGER.info(f"Given model is an if statement")
 
-                cpp_code += f"{indentation}if ({code_object.condition.replace(" AND ", " && ").replace(" OR ", " || ")})\n{indentation}{{\n"
+                cpp_code += f"{indentation}if ({code_object.condition.replace(" AND ", " && ").replace(" OR ", " || ")}) {{\n"
                 cpp_code += CppGenerator.generate(code_object, depth + 1)
                 cpp_code += f"{indentation}}}\n"
             elif isinstance(code_object, FunctionCall):
@@ -52,10 +53,19 @@ class CppGenerator:
                     cpp_code += f"#define {code_object.name} {code_object.value}\n"
                 else:
                     LOGGER.info(f"Given model is a variable definition")
+
+                    code_object.type = code_object.type.replace("unsigned_long", "unsigned long")
+
                     cpp_code += f"{indentation}{code_object.type} {code_object.name} = {code_object.value};\n"
             elif isinstance(code_object, VariableAssignment):
                 LOGGER.info(f"Given model is a variable assignment")
                 cpp_code += f"{indentation}{code_object.name} = {code_object.value};\n"
+            elif isinstance(code_object, ElseBlock):
+                LOGGER.info(f"Given model is an else block")
+
+                cpp_code += f"{indentation}else {{\n"
+                cpp_code += CppGenerator.generate(code_object, depth + 1)
+                cpp_code += f"{indentation}}}\n"
 
             LOGGER.debug(f"Generated code: {cpp_code}")
 

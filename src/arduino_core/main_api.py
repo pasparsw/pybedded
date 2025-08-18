@@ -1,3 +1,5 @@
+from src.arduino_core.definitions import long
+
 def pinMode(pin: int, mode: int) -> None:
     pass
 
@@ -14,4 +16,7 @@ def analogWrite(pin: int, value: int) -> None:
     pass
 
 def delay(time_in_ms: int) -> None:
+    pass
+
+def millis() -> long:
     pass

@@ -1,6 +1,10 @@
-# pin modes
 from enum import Enum
 
+# types
+long = int
+unsigned_long = int
+
+# pin modes
 OUTPUT: int = 0
 INPUT: int = 1
 INPUT_PULLUP: int = 2
