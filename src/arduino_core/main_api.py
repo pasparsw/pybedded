@@ -20,3 +20,9 @@ def delay(time_in_ms: int) -> None:
 
 def millis() -> long:
     pass
+
+def map(value: int, from_low: int, from_high: int, to_low: int, to_high: int) -> int:
+    pass
+
+def constrain(value: int, range_low: int, range_high: int) -> int:
+    pass

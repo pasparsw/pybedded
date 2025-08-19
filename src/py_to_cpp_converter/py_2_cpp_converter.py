@@ -10,5 +10,8 @@ class Py2CppConverter:
     def convert(python_code: List[str]) -> str:
         model: CodeObject = CodeObject(content=[])
         model = PythonParser.build_model(model, python_code)
+        dependencies: List[str] = PythonParser.get_dependencies(python_code)
+        cpp_code: str = CppGenerator.generate(model, depth=0)
+        cpp_headers: str = CppGenerator.generate_headers(dependencies)
 
-        return CppGenerator.generate(model, depth=0)
+        return cpp_headers + cpp_code

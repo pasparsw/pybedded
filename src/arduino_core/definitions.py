@@ -3,6 +3,7 @@ from enum import Enum
 # types
 long = int
 unsigned_long = int
+byte = int
 
 # pin modes
 OUTPUT: int = 0
@@ -30,3 +31,5 @@ class Board(Enum):
 
 # other
 LED_BUILTIN: int = 0
+DEC: int = 0
+HEX: int = 1

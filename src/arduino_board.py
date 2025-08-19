@@ -40,7 +40,7 @@ class ArduinoBoard:
         arduino_project_path: str = self.__create_arduino_project(file_path, cpp_code)
 
         self.__compile(arduino_project_path)
-        self.__upload(arduino_project_path)
+        # self.__upload(arduino_project_path)
         self.__clean_up(arduino_project_path)
 
         print("Done")

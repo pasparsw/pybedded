@@ -1,4 +1,5 @@
 from typing import Any
+from src.arduino_core.definitions import byte, HEX, DEC
 
 
 class Serial:
@@ -11,17 +12,27 @@ class Serial:
         pass
 
     @staticmethod
-    def print(message: Any) -> None:
+    def print(message: Any, format: int = DEC) -> None:
         pass
 
     @staticmethod
-    def println(message: Any) -> None:
+    def println(message: Any, format: int = DEC) -> None:
         pass
 
     @staticmethod
-    def read() -> str:
+    def read() -> byte:
         pass
 
     @staticmethod
-    def write() -> str:
+    def write(data: byte) -> None:
         pass
+
+    @staticmethod
+    def parseInt() -> int:
+        pass
+
+class Serial1(Serial):
+    pass
+
+class Serial2(Serial):
+    pass
