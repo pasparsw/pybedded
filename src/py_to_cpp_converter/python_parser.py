@@ -44,7 +44,7 @@ def is_else_block(python_line: str) -> bool:
     return "else" in python_line
 
 def is_comment(python_line: str) -> bool:
-    return python_line.lstrip().startswith("#")
+    return python_line.lstrip().startswith("#") or python_line.lstrip() == "setup()" or python_line.lstrip() == "loop()"
 
 def is_while_loop(python_line: str) -> bool:
     return "while " in python_line
@@ -136,6 +136,8 @@ class PythonParser:
                 dependencies.append("Servo")
             if ": SoftwareSerial" in line and "SoftwareSerial" not in dependencies:
                 dependencies.append("SoftwareSerial")
+            if  "SPI.begin(" in line and "SPI" not in dependencies:
+                dependencies.append("SPI")
 
         return dependencies
 
@@ -243,7 +245,7 @@ class PythonParser:
     def __parse_variable_modification(root_object: CodeObject, python_line: str) -> None:
         variable_name: str = python_line.lstrip().split(" ")[0]
         operator: str = python_line.lstrip().split(" ")[1].split(" ")[0]
-        variable_value: str = python_line.lstrip().split(" ")[2]
+        variable_value: str = python_line.lstrip().split(operator)[1]
 
         variable_modification = VariableModification(content=[], name=variable_name.lstrip(), operator=operator,
                                                      value=variable_value)

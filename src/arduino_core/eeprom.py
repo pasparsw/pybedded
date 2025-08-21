@@ -9,7 +9,7 @@ LOGGER = logging.getLogger("EEPROM")
 class EEPROM:
     @staticmethod
     def length() -> int:
-        pass
+        return 0
 
     @staticmethod
     def write(address: int, value: int) -> None:

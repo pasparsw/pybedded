@@ -11,8 +11,6 @@ with ArduinoBoard("/dev/ttyUSB0", Board.NANO_OLD_BOOTLOADER):
         pinMode(LED_PIN, OUTPUT)
 
     def loop() -> None:
-        brightness: byte = 0
-
         if Serial.available():
-            brightness = Serial.read()
+            brightness: byte = Serial.read()
             analogWrite(LED_PIN, brightness)

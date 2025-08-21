@@ -10,4 +10,5 @@ from .src.arduino_core.main_api import *
 from .src.arduino_core.serial import *
 from .src.arduino_core.eeprom import EEPROM
 from .src.arduino_core.servo import Servo
-from .arduino_core.software_serial import SoftwareSerial
+from .src.arduino_core.software_serial import SoftwareSerial
+from .src.arduino_core.spi import SPI

@@ -30,7 +30,11 @@ class CppGenerator:
                 args = ""
 
                 for arg in code_object.arguments:
-                    args += f"{arg.type} {arg.name}, "
+                    args += f"{arg.type.replace('unsigned_long', 'unsigned long').replace('unsigned_int', 'unsigned int')} {arg.name}, "
+
+                code_object.return_type = (code_object.return_type
+                                    .replace("unsigned_long", "unsigned long")
+                                    .replace("unsigned_int", "unsigned int"))
 
                 cpp_code += f"{indentation}{code_object.return_type} {code_object.name}({args.rstrip(", ")}) {{\n"
                 cpp_code += CppGenerator.generate(code_object, depth + 1)
@@ -67,7 +71,9 @@ class CppGenerator:
                 else:
                     LOGGER.debug(f"Given model is a variable definition")
 
-                    code_object.type = code_object.type.replace("unsigned_long", "unsigned long")
+                    code_object.type = (code_object.type
+                                        .replace("unsigned_long", "unsigned long")
+                                        .replace("unsigned_int", "unsigned int"))
 
                     if code_object.is_array:
                         if code_object.array_size:
@@ -81,7 +87,7 @@ class CppGenerator:
 
                 code_object.value = code_object.value.replace("not ", "!")
 
-                cpp_code += f"{indentation}{code_object.name} {code_object.operator} {code_object.value};\n"
+                cpp_code += f"{indentation}{code_object.name} {code_object.operator}{code_object.value};\n"
             elif isinstance(code_object, ElseBlock):
                 LOGGER.debug(f"Given model is an else block")
 

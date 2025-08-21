@@ -43,7 +43,7 @@ class ArduinoBoard:
 
         self.__compile(arduino_project_path)
         # self.__upload(arduino_project_path)
-        self.__clean_up(arduino_project_path)
+        # self.__clean_up(arduino_project_path)
 
         print("Done")
 

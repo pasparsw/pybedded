@@ -3,6 +3,7 @@ from enum import Enum
 # types
 long = int
 unsigned_long = int
+unsigned_int = int
 byte = int
 char = str
 
@@ -34,3 +35,4 @@ class Board(Enum):
 LED_BUILTIN: int = 0
 DEC: int = 0
 HEX: int = 1
+BIN: int = 2

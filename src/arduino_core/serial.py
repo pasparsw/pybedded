@@ -1,7 +1,7 @@
 import logging
 
 from typing import Any
-from src.arduino_core.definitions import byte, HEX, DEC
+from src.arduino_core.definitions import byte, DEC
 
 LOGGER = logging.getLogger("Serial")
 
@@ -18,11 +18,11 @@ class Serial:
 
     @staticmethod
     def print(message: Any, format: int = DEC) -> None:
-        LOGGER.info(f"Printing {message} in {format} format")
+        LOGGER.info(f"Printing '{message}' in {format} format")
 
     @staticmethod
     def println(message: Any, format: int = DEC) -> None:
-        LOGGER.info(f"Printing new line {message} in {format} format")
+        LOGGER.info(f"Printing new line '{message}' in {format} format")
 
     @staticmethod
     def read() -> byte:
@@ -43,3 +43,10 @@ class Serial1(Serial):
 
 class Serial2(Serial):
     pass
+
+class String:
+    def __init__(self, value: Any):
+        pass
+
+    def __str__(self):
+        return ""
