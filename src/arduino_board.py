@@ -26,9 +26,11 @@ class ArduinoBoard:
                                 level=logging.DEBUG)
 
     def __enter__(self):
+        LOGGER.info("--- Program start ---")
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        LOGGER.info("--- Program end ---")
         print("Uploading sketch...")
 
         LOGGER.info(f"Starting Python-to-Arduino conversion")

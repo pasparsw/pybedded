@@ -93,8 +93,6 @@ class CppGenerator:
 
                 cpp_code += f"{indentation}return {code_object.return_expression};\n"
 
-            LOGGER.debug(f"Generated code: {cpp_code}")
-
         return cpp_code
 
     @staticmethod

@@ -4,6 +4,7 @@ from enum import Enum
 long = int
 unsigned_long = int
 byte = int
+char = str
 
 # pin modes
 OUTPUT: int = 0

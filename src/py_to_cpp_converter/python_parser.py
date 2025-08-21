@@ -52,7 +52,6 @@ def is_while_loop(python_line: str) -> bool:
 def is_return_statement(python_line: str) -> bool:
     return "return " in python_line
 
-
 def get_block_end_line(line_number: int, python_code: List[str]) -> int:
     block_end_line = len(python_code)
     num_of_tabs: int = int((len(python_code[line_number]) - len(python_code[line_number].lstrip(" "))) / 4) + 1
@@ -133,6 +132,10 @@ class PythonParser:
         for line in python_code:
             if "EEPROM" in line and "EEPROM" not in dependencies:
                 dependencies.append("EEPROM")
+            if ": Servo" in line and "Servo" not in dependencies:
+                dependencies.append("Servo")
+            if ": SoftwareSerial" in line and "SoftwareSerial" not in dependencies:
+                dependencies.append("SoftwareSerial")
 
         return dependencies
 
@@ -213,12 +216,9 @@ class PythonParser:
 
     @staticmethod
     def __parse_variable_definition(root_object: CodeObject, python_line: str) -> None:
-        is_array: bool = False
+        is_array: bool = "List[" in python_line
         array_size: str = ""
         array_content: str = ""
-
-        if "List[" in python_line:
-            is_array = True
 
         variable_name: str = python_line.split(":")[0]
         variable_value: str = python_line.split("= ")[1]
@@ -235,7 +235,7 @@ class PythonParser:
         variable_definition = VariableDefinition(content=[], name=variable_name.lstrip(), type=variable_type,
                                                  value=variable_value, is_compile_time=variable_name.isupper(),
                                                  is_array=is_array, array_size=array_size, array_content=array_content)
-        LOGGER.debug(f"Parsed variable definition mode: {variable_definition}")
+        LOGGER.debug(f"Parsed variable definition model: {variable_definition}")
 
         root_object.content.append(variable_definition)
 
