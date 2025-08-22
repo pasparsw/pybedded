@@ -1,5 +1,3 @@
-# prerequisite: arduino-cli lib install Servo
-
 from src import *
 
 with ArduinoBoard("/dev/ttyUSB0", Board.NANO_OLD_BOOTLOADER):

@@ -94,15 +94,6 @@ class ArduinoBoard:
         LOGGER.debug(f"Compilation done")
 
     def __upload(self, arduino_project_path: FilePath) -> None:
-        """
-        # IMPORTANT: need to install arduino-cli first with sudo snap install arduino-cli
-        # and install all the necessary platforms (example: arduino-cli core install arduino:avr)
-        And this is a good content for bug of the week:
-        sudo snap connect arduino-cli:raw-usb
-        sudo snap set system experimental.hotplug=true
-        sudo systemctl restart snapd
-        sudo snap connect arduino-cli:serial-port
-        """
         LOGGER.info(f"Flashing Arduino board")
 
         SysCommandRunner.run_command(f"arduino-cli upload -p {self.__port} --fqbn {self.__board.value} {arduino_project_path}",
@@ -114,7 +105,7 @@ class ArduinoBoard:
         LOGGER.info(f"Cleaning up the workspace")
 
         if os.path.exists(arduino_project_path):
-            LOGGER.info(f"Removing Arduino project folder")
+            LOGGER.info(f"Removing Arduino project folder {arduino_project_path}")
             shutil.rmtree(arduino_project_path)
 
         LOGGER.debug(f"Clean up done")
