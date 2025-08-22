@@ -138,6 +138,8 @@ class PythonParser:
                 dependencies.append("SoftwareSerial")
             if  "SPI.begin(" in line and "SPI" not in dependencies:
                 dependencies.append("SPI")
+            if "LiquidCrystal" in line and "LiquidCrystal" not in dependencies:
+                dependencies.append("LiquidCrystal")
 
         return dependencies
 

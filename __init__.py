@@ -8,7 +8,8 @@ from .src.arduino_board import ArduinoBoard
 from .src.arduino_core.definitions import *
 from .src.arduino_core.main_api import *
 from .src.arduino_core.serial import *
-from .src.arduino_core.eeprom import EEPROM
-from .src.arduino_core.servo import Servo
-from .src.arduino_core.software_serial import SoftwareSerial
-from .src.arduino_core.spi import SPI
+from .src.arduino_core.eeprom import *
+from .src.arduino_core.servo import *
+from .src.arduino_core.software_serial import *
+from .src.arduino_core.spi import *
+from .src.arduino_core.liquid_crystal import *
