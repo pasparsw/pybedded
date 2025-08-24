@@ -3,6 +3,7 @@ import logging
 from typing import List
 
 from src.py_to_cpp_converter.models.code_object import CodeObject
+from src.py_to_cpp_converter.models.elif_statement import ElifStatement
 from src.py_to_cpp_converter.models.else_block import ElseBlock
 from src.py_to_cpp_converter.models.for_loop import ForLoop
 from src.py_to_cpp_converter.models.function_call import FunctionCall
@@ -52,6 +53,18 @@ def is_while_loop(python_line: str) -> bool:
 def is_return_statement(python_line: str) -> bool:
     return "return " in python_line
 
+def is_elif_statement(python_line: str) -> bool:
+    return "elif " in python_line
+
+def generalize_condition(python_condition: str) -> str:
+    return (python_condition
+            .replace(" and ", " AND ")
+            .replace(" or ", " OR ")
+            .replace(" not ", " NOT ")
+            .replace("not ", "NOT ")
+            .replace("True", "TRUE")
+            .replace("False", "FALSE"))
+
 def get_block_end_line(line_number: int, python_code: List[str]) -> int:
     block_end_line = len(python_code)
     num_of_tabs: int = int((len(python_code[line_number]) - len(python_code[line_number].lstrip(" "))) / 4) + 1
@@ -93,6 +106,10 @@ class PythonParser:
             elif is_for_loop(python_line):
                 LOGGER.debug(f"Found for loop at line {line_number}")
                 line_number = PythonParser.__parse_for_loop(root_object, python_line, python_code, line_number)
+                continue
+            elif is_elif_statement(python_line):
+                LOGGER.debug(f"Found elif statement at line {line_number}")
+                line_number = PythonParser.__parse_elif_statement(root_object, python_line, python_code, line_number)
                 continue
             elif is_if_statement(python_line):
                 LOGGER.debug(f"Found if statement at line {line_number}")
@@ -140,6 +157,8 @@ class PythonParser:
                 dependencies.append("SPI")
             if "LiquidCrystal" in line and "LiquidCrystal" not in dependencies:
                 dependencies.append("LiquidCrystal")
+            if ("Sd2Card" in line or "SdVolume" in line or "SdFile" in line) and "SD" not in dependencies:
+                dependencies.append("SD")
 
         return dependencies
 
@@ -206,7 +225,8 @@ class PythonParser:
     @staticmethod
     def __parse_if_statement(root_object: CodeObject, python_line: str, python_code: List[str],
                              line_number: int) -> int:
-        condition: str = python_line.split("if ")[1].split(":")[0].replace(" and ", " AND ").replace(" or ", " OR ")
+        condition: str = python_line.split("if ")[1].split(":")[0]
+        condition = generalize_condition(condition)
 
         if_statement = IfStatement(content=[], condition=condition)
         LOGGER.debug(f"Parsed if statement model: {if_statement}")
@@ -226,6 +246,7 @@ class PythonParser:
 
         variable_name: str = python_line.split(":")[0]
         variable_value: str = python_line.split("= ")[1]
+        variable_value = generalize_condition(variable_value)
         variable_type: str = python_line.split(": ")[1].split(" =")[0]
 
         if is_array:
@@ -248,6 +269,7 @@ class PythonParser:
         variable_name: str = python_line.lstrip().split(" ")[0]
         operator: str = python_line.lstrip().split(" ")[1].split(" ")[0]
         variable_value: str = python_line.lstrip().split(operator)[1]
+        variable_value = generalize_condition(variable_value)
 
         variable_modification = VariableModification(content=[], name=variable_name.lstrip(), operator=operator,
                                                      value=variable_value)
@@ -269,7 +291,8 @@ class PythonParser:
 
     @staticmethod
     def __parse_while_loop(root_object: CodeObject, python_line: str, python_code: List[str], line_number: int) -> int:
-        condition: str = python_line.split("while ")[1].split(":")[0].replace(" and ", " AND ").replace(" or ", " OR ")
+        condition: str = python_line.split("while ")[1].split(":")[0]
+        condition = generalize_condition(condition)
 
         while_loop = WhileLoop(content=[], condition=condition)
         LOGGER.debug(f"Parsed while loop model: {while_loop}")
@@ -284,8 +307,24 @@ class PythonParser:
     @staticmethod
     def __parse_return_statement(root_object: CodeObject, python_line: str) -> None:
         expression: str = python_line.split("return ")[1]
+        expression = generalize_condition(expression)
 
         return_statement = ReturnStatement(content=[], return_expression=expression)
         LOGGER.debug(f"Parsed return statement model: {return_statement}")
 
         root_object.content.append(return_statement)
+
+    @staticmethod
+    def __parse_elif_statement(root_object: CodeObject, python_line: str, python_code: List[str], line_number: int) -> int:
+        condition: str = python_line.split("elif ")[1].split(":")[0]
+        condition = generalize_condition(condition)
+
+        elif_statement = ElifStatement(content=[], condition=condition)
+        LOGGER.debug(f"Parsed elif statement model: {elif_statement}")
+
+        elif_statement_end_line: int = get_block_end_line(line_number, python_code)
+        LOGGER.debug(f"Elif statement body ends at line {elif_statement_end_line}")
+
+        root_object.content.append(PythonParser.build_model(elif_statement,
+                                                            python_code[line_number + 1:elif_statement_end_line]))
+        return elif_statement_end_line

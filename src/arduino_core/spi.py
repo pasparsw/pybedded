@@ -4,6 +4,8 @@ from src.arduino_core.definitions import byte, unsigned_int
 
 LOGGER = logging.getLogger("SPI")
 
+SPI_HALF_SPEED: int = 0
+
 class SPI:
     @staticmethod
     def begin() -> None:

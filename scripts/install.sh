@@ -1,5 +1,6 @@
 # prerequisite: arduino-cli lib install Servo
 arduino-cli lib install LiquidCrystal
+arduino-cli lib install SD
 """
         # IMPORTANT: need to install arduino-cli first with sudo snap install arduino-cli
         # and install all the necessary platforms (example: arduino-cli core install arduino:avr)
