@@ -65,6 +65,9 @@ def generalize_condition(python_condition: str) -> str:
             .replace("True", "TRUE")
             .replace("False", "FALSE"))
 
+def generalize_type(python_line: str) -> str:
+    return python_line.replace("str", "STRING")
+
 def get_block_end_line(line_number: int, python_code: List[str]) -> int:
     block_end_line = len(python_code)
     num_of_tabs: int = int((len(python_code[line_number]) - len(python_code[line_number].lstrip(" "))) / 4) + 1
@@ -122,12 +125,12 @@ class PythonParser:
             elif is_variable_definition(python_line):
                 LOGGER.debug(f"Found variable definition at line {line_number}")
                 PythonParser.__parse_variable_definition(root_object, python_line)
-            elif is_function_call(python_line):
-                LOGGER.debug(f"Found function call at line {line_number}")
-                root_object.content.append(FunctionCall(content=[], call=python_line.lstrip()))
             elif is_variable_modification(python_line):
                 LOGGER.debug(f"Found variable modification at line {line_number}")
                 PythonParser.__parse_variable_modification(root_object, python_line)
+            elif is_function_call(python_line):
+                LOGGER.debug(f"Found function call at line {line_number}")
+                root_object.content.append(FunctionCall(content=[], call=python_line.lstrip()))
             elif is_else_block(python_line):
                 LOGGER.debug(f"Found else block at line {line_number}")
                 line_number = PythonParser.__parse_else_block(root_object, python_code, line_number)
@@ -157,7 +160,7 @@ class PythonParser:
                 dependencies.append("SPI")
             if "LiquidCrystal" in line and "LiquidCrystal" not in dependencies:
                 dependencies.append("LiquidCrystal")
-            if ("Sd2Card" in line or "SdVolume" in line or "SdFile" in line) and "SD" not in dependencies:
+            if ("Sd2Card" in line or "SdVolume" in line or "SdFile" in line or "SD" in line) and "SD" not in dependencies:
                 dependencies.append("SD")
 
         return dependencies
@@ -174,7 +177,7 @@ class PythonParser:
         args: List[FunctionArgument] = []
 
         for element in arg_name_type_pairs:
-            args.append(FunctionArgument(name=element.split(": ")[0], type=element.split(": ")[1]))
+            args.append(FunctionArgument(name=element.split(": ")[0], type=generalize_type(element.split(": ")[1])))
 
         function_definition = FunctionDefinition(content=[], name=function_name, arguments=args,
                                                  return_type=function_return_type)
@@ -248,6 +251,7 @@ class PythonParser:
         variable_value: str = python_line.split("= ")[1]
         variable_value = generalize_condition(variable_value)
         variable_type: str = python_line.split(": ")[1].split(" =")[0]
+        variable_type = generalize_type(variable_type)
 
         if is_array:
             variable_type = variable_type.split("[")[1].split("]")[0]
@@ -270,6 +274,9 @@ class PythonParser:
         operator: str = python_line.lstrip().split(" ")[1].split(" ")[0]
         variable_value: str = python_line.lstrip().split(operator)[1]
         variable_value = generalize_condition(variable_value)
+
+        if "str(" in variable_value:
+            variable_value = variable_value.replace("str(", "String(")
 
         variable_modification = VariableModification(content=[], name=variable_name.lstrip(), operator=operator,
                                                      value=variable_value)

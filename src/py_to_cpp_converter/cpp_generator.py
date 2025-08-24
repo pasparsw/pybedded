@@ -25,6 +25,12 @@ def adjust_condition(condition: str) -> str:
             .replace("TRUE", "true")
             .replace("FALSE", "false"))
 
+def adjust_type(type: str) -> str:
+    return (type
+            .replace("STRING", "String")
+            .replace("unsinged_long", "unsigned long")
+            .replace("unsigned_int", "unsigned int"))
+
 
 class CppGenerator:
     @staticmethod
@@ -41,11 +47,9 @@ class CppGenerator:
                 args = ""
 
                 for arg in code_object.arguments:
-                    args += f"{arg.type.replace('unsigned_long', 'unsigned long').replace('unsigned_int', 'unsigned int')} {arg.name}, "
+                    args += f"{adjust_type(arg.type)} {arg.name}, "
 
-                code_object.return_type = (code_object.return_type
-                                    .replace("unsigned_long", "unsigned long")
-                                    .replace("unsigned_int", "unsigned int"))
+                code_object.return_type = adjust_type(code_object.return_type)
 
                 cpp_code += f"{indentation}{code_object.return_type} {code_object.name}({args.rstrip(", ")}) {{\n"
                 cpp_code += CppGenerator.generate(code_object, depth + 1)
@@ -88,9 +92,7 @@ class CppGenerator:
                 else:
                     LOGGER.debug(f"Given model is a variable definition")
 
-                    code_object.type = (code_object.type
-                                        .replace("unsigned_long", "unsigned long")
-                                        .replace("unsigned_int", "unsigned int"))
+                    code_object.type = adjust_type(code_object.type)
 
                     if code_object.is_array:
                         if code_object.array_size:
