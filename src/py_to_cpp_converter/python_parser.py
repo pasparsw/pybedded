@@ -160,7 +160,7 @@ class PythonParser:
                 dependencies.append("SPI")
             if "LiquidCrystal" in line and "LiquidCrystal" not in dependencies:
                 dependencies.append("LiquidCrystal")
-            if ("Sd2Card" in line or "SdVolume" in line or "SdFile" in line or "SD" in line) and "SD" not in dependencies:
+            if ("Sd2Card" in line or "SdVolume" in line or "SdFile" in line or "SD" in line or ": File" in line) and "SD" not in dependencies:
                 dependencies.append("SD")
 
         return dependencies

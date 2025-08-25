@@ -38,6 +38,25 @@ class File:
         FILE_LOGGER.info(f"Checking if available")
         return True
 
+    def openNextFile(self) -> "File":
+        FILE_LOGGER.info(f"Opening next file")
+        return File()
+
+    def name(self) -> str:
+        return ""
+
+    def isDirectory(self) -> bool:
+        return True
+
+    def size(self) -> int:
+        return 0
+
+    def availableForWrite(self) -> bool:
+        return True
+
+    def write(self, data: Any, size: int) -> None:
+        FILE_LOGGER.info(f"Writing to file data of size {size}: {data}")
+
 class SD:
     @staticmethod
     def begin(pin: int) -> bool:
@@ -45,7 +64,7 @@ class SD:
         return True
 
     @staticmethod
-    def open(path: str, operation: int = FILE_READ) -> File:
+    def open(path: Any, operation: int = FILE_READ) -> File:
         SD_LOGGER.info(f"Opening file {path} ({operation})")
         return File()
 

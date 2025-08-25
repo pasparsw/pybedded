@@ -28,7 +28,7 @@ def adjust_condition(condition: str) -> str:
 def adjust_type(type: str) -> str:
     return (type
             .replace("STRING", "String")
-            .replace("unsinged_long", "unsigned long")
+            .replace("unsigned_long", "unsigned long")
             .replace("unsigned_int", "unsigned int"))
 
 
