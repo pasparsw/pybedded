@@ -8,3 +8,4 @@ from .arduino_core.software_serial import *
 from .arduino_core.spi import *
 from .arduino_core.liquid_crystal import *
 from .arduino_core.sd import *
+from .arduino_core.stepper import *

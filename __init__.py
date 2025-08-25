@@ -14,3 +14,4 @@ from .src.arduino_core.software_serial import *
 from .src.arduino_core.spi import *
 from .src.arduino_core.liquid_crystal import *
 from .src.arduino_core.sd import *
+from .src.arduino_core.stepper import *

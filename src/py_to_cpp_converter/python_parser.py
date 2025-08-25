@@ -162,6 +162,8 @@ class PythonParser:
                 dependencies.append("LiquidCrystal")
             if ("Sd2Card" in line or "SdVolume" in line or "SdFile" in line or "SD" in line or ": File" in line) and "SD" not in dependencies:
                 dependencies.append("SD")
+            if ": Stepper" in line and "Stepper" not in dependencies:
+                dependencies.append("Stepper")
 
         return dependencies
 
