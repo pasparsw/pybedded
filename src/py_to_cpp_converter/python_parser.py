@@ -9,6 +9,7 @@ from src.py_to_cpp_converter.models.for_loop import ForLoop
 from src.py_to_cpp_converter.models.function_call import FunctionCall
 from src.py_to_cpp_converter.models.function_definition import FunctionArgument, FunctionDefinition
 from src.py_to_cpp_converter.models.if_statement import IfStatement
+from src.py_to_cpp_converter.models.preprocessor_directive import PreprocessorDirective
 from src.py_to_cpp_converter.models.return_statement import ReturnStatement
 from src.py_to_cpp_converter.models.variable_modification import VariableModification
 from src.py_to_cpp_converter.models.variable_definition import VariableDefinition
@@ -39,7 +40,8 @@ def is_variable_definition(python_line: str) -> bool:
 
 def is_variable_modification(python_line: str) -> bool:
     return " = " in python_line or " += " in python_line or " -= " in python_line or " *= " in python_line \
-        or " /= " in python_line
+        or " /= " in python_line or " <<= " in python_line or " >>= " in python_line or " &= " in python_line \
+        or " |= " in python_line
 
 def is_else_block(python_line: str) -> bool:
     return "else" in python_line
@@ -55,6 +57,9 @@ def is_return_statement(python_line: str) -> bool:
 
 def is_elif_statement(python_line: str) -> bool:
     return "elif " in python_line
+
+def is_preprocessor_directive(python_line: str) -> bool:
+    return "IFDEF(" in python_line or "IFNDEF(" in python_line or "ENDIF(" in python_line
 
 def generalize_condition(python_condition: str) -> str:
     return (python_condition
@@ -102,6 +107,9 @@ class PythonParser:
             if is_comment(python_line):
                 line_number += 1
                 continue
+            elif is_preprocessor_directive(python_line):
+                LOGGER.debug(f"Found preprocessor directive at line {line_number}")
+                PythonParser.__parse_preprocessor_directive(root_object, python_line)
             elif is_function_definition(python_line):
                 LOGGER.debug(f"Found function definition at line {line_number}")
                 line_number = PythonParser.__parse_function_definition(root_object, python_line, python_code, line_number)
@@ -156,7 +164,7 @@ class PythonParser:
                 dependencies.append("Servo")
             if ": SoftwareSerial" in line and "SoftwareSerial" not in dependencies:
                 dependencies.append("SoftwareSerial")
-            if  "SPI.begin(" in line and "SPI" not in dependencies:
+            if  "SPI." in line and "SPI" not in dependencies:
                 dependencies.append("SPI")
             if "LiquidCrystal" in line and "LiquidCrystal" not in dependencies:
                 dependencies.append("LiquidCrystal")
@@ -164,6 +172,12 @@ class PythonParser:
                 dependencies.append("SD")
             if ": Stepper" in line and "Stepper" not in dependencies:
                 dependencies.append("Stepper")
+            if ("Ethernet" in line or ": EthernetServer" in line or "EthernetClient" in line) and "Ethernet" not in dependencies:
+                dependencies.append("Ethernet")
+            if "Keyboard." in line and "Keyboard" not in dependencies:
+                dependencies.append("Keyboard")
+            if "Wire." in line and "Wire" not in dependencies:
+                dependencies.append("Wire")
 
         return dependencies
 
@@ -179,7 +193,13 @@ class PythonParser:
         args: List[FunctionArgument] = []
 
         for element in arg_name_type_pairs:
-            args.append(FunctionArgument(name=element.split(": ")[0], type=generalize_type(element.split(": ")[1])))
+            element_type: str = element.split(": ")[1]
+
+            if "List[" in element_type:
+                underlying_type: str = element_type.split("[")[1].split("]")[0]
+                element_type = f"{underlying_type}*".replace("str*", "char*")
+
+            args.append(FunctionArgument(name=element.split(": ")[0], type=element_type))
 
         function_definition = FunctionDefinition(content=[], name=function_name, arguments=args,
                                                  return_type=function_return_type)
@@ -337,3 +357,16 @@ class PythonParser:
         root_object.content.append(PythonParser.build_model(elif_statement,
                                                             python_code[line_number + 1:elif_statement_end_line]))
         return elif_statement_end_line
+
+    @staticmethod
+    def __parse_preprocessor_directive(root_object: CodeObject, python_line: str) -> None:
+        directive: str = python_line.lstrip().split("(")[0]
+        expression: str = ""
+
+        if directive != "ENDIF":
+            expression = python_line.split('("')[1].split('")')[0]
+
+        preprocessor_directive = PreprocessorDirective(content=[], directive=directive, expression=expression)
+        LOGGER.debug(f"Parsed preprocessor directive model: {preprocessor_directive}")
+
+        root_object.content.append(preprocessor_directive)

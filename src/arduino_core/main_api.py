@@ -30,6 +30,9 @@ def millis() -> long:
     LOGGER.info(f"Getting current timestamp")
     return 0
 
+def micros() -> long:
+    return 0
+
 def map(value: int, from_low: int, from_high: int, to_low: int, to_high: int) -> int:
     LOGGER.info(f"Mapping value {value} from range {from_low}-{from_high} to range {to_low}-{to_high}")
     return 0

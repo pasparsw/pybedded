@@ -9,3 +9,6 @@ from .arduino_core.spi import *
 from .arduino_core.liquid_crystal import *
 from .arduino_core.sd import *
 from .arduino_core.stepper import *
+from .arduino_core.ethernet import *
+from .arduino_core.keyboard import *
+from .arduino_core.wire import *

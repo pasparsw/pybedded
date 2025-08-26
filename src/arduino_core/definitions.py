@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Any, List
 
 # types
 long = int
@@ -36,3 +37,18 @@ LED_BUILTIN: int = 0
 DEC: int = 0
 HEX: int = 1
 BIN: int = 2
+
+def word(range_1: Any, range_2: Any) -> unsigned_long:
+    return 0
+
+def memset(buffer: List[byte], value: int, size: int) -> None:
+    pass
+
+def IFDEF(condition: str) -> None:
+    pass
+
+def IFNDEF(condition: str) -> None:
+    pass
+
+def ENDIF() -> None:
+    pass

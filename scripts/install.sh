@@ -2,6 +2,8 @@
 arduino-cli lib install LiquidCrystal
 arduino-cli lib install SD
 arduino-cli lib install Stepper
+arduino-cli lib install Ethernet
+arduino-cli lib install Keyboard
 """
         # IMPORTANT: need to install arduino-cli first with sudo snap install arduino-cli
         # and install all the necessary platforms (example: arduino-cli core install arduino:avr)

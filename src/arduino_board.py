@@ -31,8 +31,6 @@ class ArduinoBoard:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         LOGGER.info("--- Program end ---")
-        print("Uploading sketch...")
-
         LOGGER.info(f"Starting Python-to-Arduino conversion")
 
         file_path, start_line = self.__get_callers_properties()
@@ -41,7 +39,9 @@ class ArduinoBoard:
         print(cpp_code)
         arduino_project_path: str = self.__create_arduino_project(file_path, cpp_code)
 
+        print("Compiling...")
         self.__compile(arduino_project_path)
+        print("Uploading...")
         # self.__upload(arduino_project_path)
         self.__clean_up(arduino_project_path)
 

@@ -25,7 +25,7 @@ class Serial:
         LOGGER.info(f"Printing new line '{message}' in {format} format")
 
     @staticmethod
-    def read() -> byte:
+    def read() -> Any:
         LOGGER.info(f"Reading byte from serial")
         return 0
 

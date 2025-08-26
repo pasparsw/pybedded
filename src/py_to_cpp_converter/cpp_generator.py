@@ -8,6 +8,7 @@ from src.py_to_cpp_converter.models.for_loop import ForLoop
 from src.py_to_cpp_converter.models.function_call import FunctionCall
 from src.py_to_cpp_converter.models.function_definition import FunctionDefinition
 from src.py_to_cpp_converter.models.if_statement import IfStatement
+from src.py_to_cpp_converter.models.preprocessor_directive import PreprocessorDirective
 from src.py_to_cpp_converter.models.return_statement import ReturnStatement
 from src.py_to_cpp_converter.models.variable_modification import VariableModification
 from src.py_to_cpp_converter.models.variable_definition import VariableDefinition
@@ -117,6 +118,14 @@ class CppGenerator:
                 LOGGER.debug(f"Given model is a return statement")
 
                 cpp_code += f"{indentation}return {code_object.return_expression};\n"
+            elif isinstance(code_object, PreprocessorDirective):
+                LOGGER.debug(f"Given model is a preprocessor directive")
+
+                directive: str = (code_object.directive
+                                  .replace("IFNDEF", "ifndef")
+                                  .replace("IFDEF", "ifdef")
+                                  .replace("ENDIF", "endif"))
+                cpp_code += f"#{directive} {code_object.expression}\n"
 
         return cpp_code
 

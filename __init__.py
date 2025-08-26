@@ -15,3 +15,6 @@ from .src.arduino_core.spi import *
 from .src.arduino_core.liquid_crystal import *
 from .src.arduino_core.sd import *
 from .src.arduino_core.stepper import *
+from .src.arduino_core.ethernet import *
+from .src.arduino_core.keyboard import *
+from .src.arduino_core.wire import *
