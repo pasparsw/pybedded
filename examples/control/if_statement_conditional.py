@@ -7,15 +7,21 @@ from src import *
 upload_sketch: bool = not (len(sys.argv) == 2 and sys.argv[1] == "--no-upload")
 
 with ArduinoBoard("/dev/ttyUSB0", Board.UNO, upload=upload_sketch):
+    analog_pin: int = A0
+    led_pin: int = 13
+    threshold: int = 400
+
     def setup() -> None:
-        Wire.begin()
+        pinMode(led_pin, OUTPUT)
         Serial.begin(9600)
 
     def loop() -> None:
-        Wire.requestFrom(8, 6)
+        analog_value: int = analogRead(analog_pin)
 
-        while Wire.available():
-            c: char = Wire.read()
-            Serial.print(c)
+        if analog_value > threshold:
+            digitalWrite(led_pin, HIGH)
+        else:
+            digitalWrite(led_pin, LOW)
 
-        delay(500)
+        Serial.println(analog_value)
+        delay(1)

@@ -59,7 +59,7 @@ class CppGenerator:
                 LOGGER.debug(f"Given model is a for loop")
 
                 cpp_code += (f"{indentation}for (int {code_object.iter_var_name}={code_object.start_index}; "
-                             f"{code_object.iter_var_name}<{code_object.end_index}; "
+                             f"{code_object.iter_var_name}{'>=' if code_object.step.startswith('-') else '<'}{code_object.end_index}; "
                              f"{code_object.iter_var_name} += {code_object.step}) {{\n")
                 cpp_code += CppGenerator.generate(code_object, depth + 1)
                 cpp_code += f"{indentation}}}\n"

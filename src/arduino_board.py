@@ -16,10 +16,14 @@ FilePath = str
 LineNumber = int
 
 class ArduinoBoard:
-    def __init__(self, port: str, board: Board, verbose: bool = False):
+    def __init__(self, port: str, board: Board, verbose: bool = False, compile: bool = True, upload: bool = True,
+                 clean_up: bool = True):
         self.__port: str = port
         self.__board: Board = board
         self.__verbose: bool = verbose
+        self.__compile_code: bool = compile
+        self.__upload_code: bool = upload
+        self.__clean_up_workspace: bool = clean_up
 
         if self.__verbose:
             logging.basicConfig(format='[%(levelname)s][%(name)s] %(message)s',
@@ -36,14 +40,16 @@ class ArduinoBoard:
         file_path, start_line = self.__get_callers_properties()
         python_code: List[str] = self.__load_arduino_python_code(file_path, start_line)
         cpp_code: str = Py2CppConverter.convert(python_code)
-        print(cpp_code)
         arduino_project_path: str = self.__create_arduino_project(file_path, cpp_code)
 
-        print("Compiling...")
-        self.__compile(arduino_project_path)
-        print("Uploading...")
-        # self.__upload(arduino_project_path)
-        self.__clean_up(arduino_project_path)
+        if self.__compile_code:
+            print("Compiling...")
+            self.__compile(arduino_project_path)
+        if self.__upload_code:
+            print("Uploading...")
+            self.__upload(arduino_project_path)
+        if self.__clean_up_workspace:
+            self.__clean_up(arduino_project_path)
 
         print("Done")
 
