@@ -37,6 +37,58 @@ class Serial:
     def parseInt() -> int:
         LOGGER.info(f"Parsing int from serial")
         return 0
+    
+    @staticmethod
+    def availableForWrite() -> int:
+        return 0
+    
+    @staticmethod
+    def end() -> None:
+        pass
+
+    @staticmethod
+    def find(target: str) -> int:
+        return 0
+    
+    @staticmethod
+    def findUntil(target: str, terminator: str) -> int:
+        return 0
+    
+    @staticmethod
+    def flush() -> None:
+        pass
+
+    @staticmethod
+    def parseFloat() -> float:
+        return 0.0
+    
+    @staticmethod
+    def peek() -> int:
+        return 0
+    
+    @staticmethod
+    def readBytes(buffer: bytearray, length: int) -> int:
+        return 0
+    
+    @staticmethod
+    def readBytesUntil(terminator: str, buffer: bytearray, length: int) -> int:
+        return 0
+    
+    @staticmethod
+    def readString() -> str:
+        return ""
+    
+    @staticmethod
+    def readStringUntil(terminator: str) -> str:
+        return ""
+    
+    @staticmethod
+    def setTimeout(timeout: int) -> None:
+        pass
+
+    @staticmethod
+    def serialEvent() -> None:
+        pass
 
 class Serial1(Serial):
     pass

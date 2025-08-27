@@ -1,6 +1,6 @@
 from typing import Any
 
-from src.arduino_core.definitions import byte, char
+from src.arduino_core.definitions import byte, long
 
 
 class Wire:
@@ -39,3 +39,23 @@ class Wire:
     @staticmethod
     def onRequest(callback) -> None:
         pass
+
+    @staticmethod
+    def end() -> None:
+        pass
+
+    @staticmethod
+    def setClock(frequency: long) -> None:
+        pass
+
+    @staticmethod
+    def setWireTimeout(timeout: long, reset_on_timeout: bool = True) -> None:
+        pass
+
+    @staticmethod
+    def clearWireTimeoutFlag() -> None:
+        pass
+
+    @staticmethod
+    def getWireTimeoutFlag() -> bool:
+        return False

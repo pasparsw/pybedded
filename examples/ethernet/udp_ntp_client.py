@@ -12,7 +12,7 @@ with ArduinoBoard("/dev/ttyUSB0", Board.UNO, upload=upload_sketch):
     mac: List[byte] = [0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED]
     local_port: unsigned_int = 8888
     time_server: List[char] = ["time.nist.gov"]
-    packet_buffer: List[byte] = [] # max=NTP_PACKET_SIZE
+    packet_buffer: List[byte] = [] # size=NTP_PACKET_SIZE
     udp: EthernetUDP = EthernetUDP()
 
     def sendNTPpacket(address: List[char]) -> None:

@@ -12,7 +12,7 @@ upload_sketch: bool = not (len(sys.argv) == 2 and sys.argv[1] == "--no-upload")
 with ArduinoBoard("/dev/ttyUSB0", Board.UNO, upload=upload_sketch):
     NUM_READINGS: int = 10
 
-    readings: List[int] = [] # max=NUM_READINGS
+    readings: List[int] = [] # size=NUM_READINGS
     read_index: int = 0
     total: int = 0
     average: int = 0

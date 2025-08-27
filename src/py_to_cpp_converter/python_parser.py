@@ -278,8 +278,8 @@ class PythonParser:
         if is_array:
             variable_type = variable_type.split("[")[1].split("]")[0]
             variable_value = variable_value.split(" #")[0]
-            if "# max=" in python_line:
-                array_size = python_line.split("# max=")[1]
+            if "# size=" in python_line:
+                array_size = python_line.split("# size=")[1]
             else:
                 array_content = python_line.split("] = [")[1].split("]")[0]
 

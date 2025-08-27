@@ -11,7 +11,7 @@ with ArduinoBoard("/dev/ttyUSB0", Board.UNO, upload=upload_sketch):
 
     ip: IPAddress = IPAddress(192, 168, 1, 177)
     local_port: unsigned_int = 8888
-    packet_buffer: List[char] = [] # max=UDP_TX_PACKET_MAX_SIZE
+    packet_buffer: List[char] = [] # size=UDP_TX_PACKET_MAX_SIZE
     reply_buffer: List[char] = ["acknowledged"]
     udp: EthernetUDP = EthernetUDP()
 

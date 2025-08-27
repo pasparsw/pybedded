@@ -15,7 +15,7 @@ with ArduinoBoard("/dev/ttyUSB0", Board.UNO, upload=upload_sketch):
     subnet: IPAddress = IPAddress(255, 255, 0, 0)
 
     server: EthernetServer = EthernetServer(23)
-    clients: List[EthernetClient] = [] # max=8
+    clients: List[EthernetClient] = [] # size=8
 
     def setup() -> None:
         Ethernet.init(10)
@@ -55,7 +55,7 @@ with ArduinoBoard("/dev/ttyUSB0", Board.UNO, upload=upload_sketch):
 
         for i in range(8):
             if clients[i] and clients[i].available():
-                buffer: List[byte] = [] # max=80
+                buffer: List[byte] = [] # size=80
                 count: int = clients[i].read(buffer, 80)
 
                 for j in range(8):
