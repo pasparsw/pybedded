@@ -1,12 +1,6 @@
-import logging
-
 from dataclasses import dataclass
 from typing import List, Any
 from src.arduino_core.definitions import byte
-
-ETHERNET_LOGGER = logging.getLogger("Ethernet")
-ETHERNET_SERVER_LOGGER = logging.getLogger("EthernetServer")
-ETHERNET_CLIENT_LOGGER = logging.getLogger("EthernetClient")
 
 # hardware status
 EthernetNoHardware: int = 0
@@ -35,13 +29,11 @@ class IPAddress:
 class Ethernet:
     @staticmethod
     def init(cs_pin: int) -> None:
-        ETHERNET_LOGGER.info(f"Initializing Ethernet on CS pin {cs_pin}")
+        pass
 
     @staticmethod
     def begin(mac: List[byte], ip: IPAddress = None, dns: IPAddress = None, gateway: IPAddress = None,
               subnet: IPAddress = None) -> int:
-        ETHERNET_LOGGER.info(f"Beginning Ethernet communication with properties: {mac}, {ip}, {dns}, {gateway}, "
-                             f"{subnet}")
         return 1
 
     @staticmethod
@@ -62,10 +54,10 @@ class Ethernet:
 
 class EthernetClient:
     def print(self, message: Any) -> None:
-        ETHERNET_CLIENT_LOGGER.info(f"Printing '{message}'")
+        pass
 
     def println(self, message: Any) -> None:
-        ETHERNET_CLIENT_LOGGER.info(f"Printing with new line '{message}'")
+        pass
 
     def available(self) -> int:
         return 1
@@ -96,10 +88,10 @@ class EthernetClient:
 
 class EthernetServer:
     def __init__(self, port: int):
-        ETHERNET_SERVER_LOGGER.info(f"Creating Ethernet server on port {port}")
+        pass
 
     def begin(self) -> None:
-        ETHERNET_SERVER_LOGGER.info(f"Starting Ethernet server")
+        pass
 
     def accept(self) -> EthernetClient:
         return EthernetClient()

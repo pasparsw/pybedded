@@ -45,14 +45,3 @@ with ArduinoBoard("/dev/ttyUSB0", Board.UNO, upload=upload_sketch):
             Serial.println("Done\n")
 
         delay(5000)
-
-a = True
-b = True
-c = True
-d = True
-
-if a and b and \
-    c and d:
-    pass
-value: int = map(12, 0, 1023,
-                 0, 255)

@@ -1,9 +1,5 @@
-import logging
-
 from dataclasses import dataclass
 from src.arduino_core.definitions import byte, unsigned_int, long
-
-LOGGER = logging.getLogger("SPI")
 
 SPI_HALF_SPEED: int = 0
 MSBFIRST: int = 0
@@ -22,11 +18,10 @@ class SPISettings:
 class SPI:
     @staticmethod
     def begin() -> None:
-        LOGGER.info(f"Beginning SPI communication")
+        pass
 
     @staticmethod
     def transfer(data: byte) -> unsigned_int:
-        LOGGER.info(f"Transferring data {data}")
         return 0
     
     @staticmethod

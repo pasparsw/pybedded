@@ -1,6 +1,6 @@
 # Introduction
 
-**_PyBedded_** is an experimental utility which allows you to write code for Arduino using Python. The purpose of this project **is not** to control Arduino board by a Python script hosted on a different machine. The purpose of **_PyBedded_** is to actually enable user to flash Arduino board with the logic written with Python, so that the board is independent from host.
+**_PyBedded_** is an experimental utility which allows user to write code for Arduino using Python. The purpose of this project **is not** to control Arduino board by a Python script hosted on a different machine. The purpose of **_PyBedded_** is to enable user to flash Arduino board with the actual logic written with Python, so that the board is independent from host.
 
 # Quick start
 
@@ -50,7 +50,7 @@ There are certain rules that need to be followed when writing code with **_PyBed
 
 ## Required code structure
 
-Similarily as in Arduino IDE, the minimum code structure in the Arduino code block are `setup` and `loop` functions:
+Similarily as in Arduino IDE, the minimum code structure in the Arduino code block consists of `setup` and `loop` functions:
 
 ```python
 def setup() -> None:
@@ -85,7 +85,7 @@ def loop() -> None:
 
 ### Compile-time constants
 
-Python is not a compiled programming language, so in order to support compile time constants (`#define` in C and C++), there needs to be a special mechanism which distinguishes them from the ordinary variables. **_PyBedded_** uses for that purpose a simple naming convention - if Python's variable name is all uppercase, it will end up as a compile time constant:
+Python is not a compiled programming language, so in order to support compile time constants (`#define` in C and C++), there needs to be a special mechanism which distinguishes them from the ordinary variables. **_PyBedded_** uses for that purpose a simple naming convention - if Python's variable name is uppercase, it will end up as a compile time constant:
 
 ```python
 LED_PIN: int = 12
@@ -109,7 +109,7 @@ from typing import List
 array: List[int] = [1, 2, 3, 4, 5]
 ```
 
-However, if you declare an empty array, you must provide its size. Again, in Python there is nothing like size of the `List` specified upfront, so here another convention is used:
+However, if you declare an empty array, you must provide its size in the comment. Again, in Python there is nothing like size of the `List` specified upfront, so here another convention is used:
 
 ```python
 array: List[int] = [] # size=12
@@ -130,13 +130,27 @@ def calibrate(sensor: str, time: int) -> int:
     return 0
 ```
 
+## Pre-processor directives
+
+To include some compile-time conditions into your code, user can user the following functions provided by **_PyBedded_**:
+* `IFDEF("FLAG")` - equivalent of `#ifdef FLAG` in C/C++
+* `IFNDEF("FLAG")` - equivalent of `#ifndef FLAG` in C/C++
+* `ENDIF` - equivalent of `#endif` in C/C++
+
+```python
+IFDEF("SOME_FEATURE_FLAG")
+    for i in range(10):
+        print(i)
+ENDIF()
+```
+
 ## Core Arduino API
 
-You can expect the core Arduino API to be already there (things like `analogRead`, `millis`, `Serial`, `constain` etc.).
+You can expect the core Arduino API to be already there (things like `analogRead`, `millis`, `Serial`, `constrain` etc.).
 
-## Thirdparty libraries
+## External libraries
 
-The following thirdparty libraries are currently supported:
+The following external libraries are currently supported:
 * EEPROM
 * Servo
 * SoftwareSerial
@@ -148,7 +162,7 @@ The following thirdparty libraries are currently supported:
 * Keyboard
 * Wire
 
-You don't need to take care about including them in any way - if you use e.g. `SdVolume` type in your code, the proper `SD.h` will be included before the compilation.
+You don't need to take care about including them in any way - if you use e.g. `SdVolume` type in your code, the proper `"SD.h"` header will be included before the compilation.
 
 # Debugging
 

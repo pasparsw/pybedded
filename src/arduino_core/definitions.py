@@ -44,6 +44,9 @@ def word(range_1: Any, range_2: Any) -> unsigned_long:
 def memset(buffer: List[byte], value: int, size: int) -> None:
     pass
 
+def sizeof(obj: Any) -> int:
+    return 0
+
 def IFDEF(condition: str) -> None:
     pass
 
